@@ -1,4 +1,4 @@
-# 💻 Programación 2  
+# 💻 Probabilidad y Estadística  
 **Tecnicatura Universitaria en Programación a distancia**  
 📍 *Universidad Tecnológica Nacional - Regional San Nicolás*   
 
