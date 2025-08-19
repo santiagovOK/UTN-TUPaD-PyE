@@ -1,6 +1,6 @@
 # Santiago Octavio Varela - <santiago.varela@tupad.utn.edu.ar>
 
-# Última actualización: 2025-08-18
+# Última actualización: 2025-08-19
 
 # PyE - TPI - Semana 3, consigna 2
 
