@@ -1,18 +1,16 @@
 # Santiago Octavio Varela - <santiago.varela@tupad.utn.edu.ar>
 
-# Última actualización: 2025-09-01
+# Última actualización: 2025-09-02
 
-# PyE - TPI - Semana 5, consignas 3-4 (continuación de la semana 3, lo nuevo de esta semana está a partir de TENDENCIA CENTRAL)
-
-# Construir la/s Tabla/s de Frecuencias y calcular todas las frecuencias de las siguientes variables:
-
-# a. Tiempo en horas semanales dedicadas al estudio. (Determinar la cantidad optima de intervalos a utilizar)
-# b. Nivel de satisfacción con la Carrera.
-# c. A partir de la tabla obtenida en el punto a. realizar la interpretación de todas las frecuencias correspondientes al cuarto intervalo en el contexto del caso planteado.
-# d. A partir de la tabla obtenida en el punto b. realizar la interpretación de todas las frecuencias correspondientes a la categoría “Satisfecho”
+# PyE - TPI - Semana 5, consignas 3-4 (continuación de la semana 3, lo nuevo de esta semana está a partir de TENDENCIA CENTRAL en cada caso)
 
 # Instalamos los paquetes necesarios
 
+# ggplot2 para la creación de gráficas en la consigna 4
+if(!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+
+# readxl para la lectura del archivo
 if(!require(readxl)) install.packages("readxl")
 library(readxl)
 
@@ -89,7 +87,7 @@ marca_clase <- (cortes + cortes + amplitud) / 2
 # Definir variable continua para mensajes
 variable_continua <- "TIEMPO SEMANAL en HS. DEDIC. EST."
 
-# Medidas de Tendencia Central
+# Medidas de TENDENCIA CENTRAL
 
 # Cálculos para la variable continua en "TIEMPO SEMANAL en HS. DEDIC. EST."
 
@@ -161,7 +159,7 @@ Q2 <- cuartiles[2]  # Segundo cuartil (50% = mediana)
 Q3 <- cuartiles[3]  # Tercer cuartil (75%)
 
 # Rango - Diferencia entre máximo y mínimo
-rango_continua <- max(tiempo_semanal) - min(tiempo_semanal)
+rango_continua <- max(tiempo_semanal) - min(tiempo_semanal) # 25 - 0 = 25
 
 # Varianza agrupada para datos continuos
 varianza_continua <- sum(frecuencias * (marca_clase - media_continua)^2) / (n_total - 1)
@@ -184,7 +182,7 @@ continua_stats <- data.frame(
   
   # Cuartiles
   Q1 = round(Q1, 4),
-  Q2 = round(Q2, 4),
+  Q2 = round(Q2, 4), # Mediana
   Q3 = round(Q3, 4),
   
   # Medidas de dispersión
@@ -200,6 +198,34 @@ print(continua_stats, row.names = FALSE)
 # Mensaje final
 
 message("\n Fin de resultados medidas de tendencia central - VARIABLE CONTINUA (", variable_continua, ")")
+
+# Construcción del histograma en función de las frecuencias absolutas
+
+# Agrupa datos numéricos en intervalos (bins) y muestra su frecuencia.
+
+# ggplot2 ya fue cargado previamente - VER AL COMIENZO DEL SCRIPT
+
+# R BASE
+hist(tiempo_semanal,
+     breaks = breaks,           # usamos los mismos breaks calculados anteriormente
+     col = "skyblue",           # color de las barras
+     main = "Histograma de Tiempo Semanal en Horas Dedicadas al Estudio", # título del gráfico
+     xlab = "Tiempo Semanal (horas)",    # etiqueta eje x
+     ylab = "Frecuencia Absoluta",       # etiqueta eje y
+     freq = TRUE)               # TRUE: muestra frecuencias absolutas en c/barra
+
+# GGPLOT2
+# Usamos los mismos cortes calculados anteriormente para mantener consistencia
+ggplot(data.frame(tiempo = tiempo_semanal), aes(x = tiempo)) +
+  geom_histogram(breaks = breaks,       # Usamos los breaks ya calculados
+                 closed = "left",       # intervalos [a,b) como en cut()
+                 fill = "skyblue", color = "white") +
+  labs(title = "Histograma de Tiempo Semanal en Horas Dedicadas al Estudio",
+       x = "Tiempo Semanal (horas)", 
+       y = "Frecuencia Absoluta") +
+  theme_minimal()
+
+message("\n Fin del creación del histograma para (", variable_continua, ") en base a sus frecuencias absolutas y los intervalos previamente creados")
 
 message("\n Comenzamos con el análisis completo de: SATISFACCIÓN CON LA CARRERA")
 
@@ -250,9 +276,8 @@ categorias <- names(tabla_satisfaccion)
 # Definir variable categórica para mensajes
 variable_categorica <- "SATISFACCIÓN CON LA CARRERA"
 
-# Medidas de Tendencia Central para Variable Categórica
-
 # Moda
+
 # Índice de la categoría con mayor frecuencia
 indice_moda_cat <- which.max(frecuencias_cat)
 
@@ -282,9 +307,6 @@ datos_numericos_cat <- as.numeric(as.factor(datos[[variable_categorica]]))
 # Cuartiles usando la función quantile
 cuartiles <- quantile(datos_numericos_cat, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
 
-# Rango intercuartil usando la función IQR
-rango_intercuartil <- IQR(datos_numericos_cat, na.rm = TRUE)
-
 # Convertir cuartiles numéricos de vuelta a categorías
 q1_cat <- categorias[round(cuartiles[1])]
 q2_cat <- categorias[round(cuartiles[2])]  # Mediana
@@ -299,10 +321,32 @@ categorica_stats <- data.frame(
   Frecuencia_Moda = frec_moda_cat,
   Mediana = mediana_categorica,
   Q1 = q1_cat,
-  Q2_Mediana = q2_cat,
-  Q3 = q3_cat,
-  Rango_Intercuartil = round(rango_intercuartil, 4)
+  Q2 = q2_cat, # Mediana
+  Q3 = q3_cat
 )
 
 print(categorica_stats, row.names = FALSE)
+
+# Gráfico circular (Torta) para la consigna 4 - muestra proporciones relativas de cada categoría respecto al total.
+
+# R BASE
+porcentajes_satisfaccion <- round(as.vector(f_rel_satisfaccion) * 100, 1) # convertimos a porcentajes
+nombres_satisfaccion <- names(tabla_satisfaccion)
+
+pie(porcentajes_satisfaccion,         # partes del total
+    labels = paste(nombres_satisfaccion, "\n", porcentajes_satisfaccion, "%"), # etiquetas con porcentajes
+    col = rainbow(length(nombres_satisfaccion)),    # asigna automáticamente colores distintos
+    main = "Nivel de Satisfacción con la Carrera") # título del gráfico
+
+# GGPLOT2
+df_satisfaccion <- data.frame(
+  Satisfaccion = nombres_satisfaccion, 
+  porcentaje = porcentajes_satisfaccion
+)
+
+ggplot(df_satisfaccion, aes(x = "", y = porcentaje, fill = Satisfaccion)) +
+  geom_bar(stat = "identity", width = 1) +  # barras proporcionales
+  coord_polar("y") +                        # convierte barras en sectores circulares
+  labs(title = "Nivel de Satisfacción con la Carrera") +
+  theme_void()
 
