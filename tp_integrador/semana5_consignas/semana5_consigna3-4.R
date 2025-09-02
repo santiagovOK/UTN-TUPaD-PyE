@@ -152,6 +152,26 @@ desvio_continua <- sqrt(varianza_continua)
 # Coeficiente de variación (%)
 coef_var_continua <- (desvio_continua / media_continua) * 100
 
+# Calculamos los cuartiles
+cuartiles <- quantile(tiempo_semanal, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
+
+# Almacenamos en variables cada cuartil individual
+Q1 <- cuartiles[1]  # Primer cuartil (25%)
+Q2 <- cuartiles[2]  # Segundo cuartil (50% = mediana)
+Q3 <- cuartiles[3]  # Tercer cuartil (75%)
+
+# Rango - Diferencia entre máximo y mínimo
+rango_continua <- max(tiempo_semanal) - min(tiempo_semanal)
+
+# Varianza agrupada para datos continuos
+varianza_continua <- sum(frecuencias * (marca_clase - media_continua)^2) / (n_total - 1)
+
+# Desviación Estándar agrupada
+desvio_continua <- sqrt(varianza_continua)
+
+# Rango Intercuartílico 
+IQR_continua <- IQR(tiempo_semanal, na.rm = TRUE)
+
 # Mostrar resultados agrupados
 message("\n Resultados medidas de tendencia central - VARIABLE CONTINUA (", variable_continua, ")")
 
@@ -159,8 +179,17 @@ message("\n Resultados medidas de tendencia central - VARIABLE CONTINUA (", vari
 
 continua_stats <- data.frame(
   Media = round(media_continua, 4),
-  Moda = round(moda_continua, 4),
   Mediana = round(mediana_continua, 4),
+  Moda = round(moda_continua, 4),
+  
+  # Cuartiles
+  Q1 = round(Q1, 4),
+  Q2 = round(Q2, 4),
+  Q3 = round(Q3, 4),
+  
+  # Medidas de dispersión
+  Rango = round(rango_continua, 4),
+  IQR = round(IQR_continua, 4),
   Varianza = round(varianza_continua, 4),
   Desvio_Estandar = round(desvio_continua, 4),
   Coef_Variacion_pct = round(coef_var_continua, 4)
@@ -206,55 +235,74 @@ print("Tabla de frecuencias para 'SATISFACCIÓN CON LA CARRERA' \n ")
 print(tabla_frecuencias_satisfaccion)
 
 # MEDIDAS DE TENDENCIA CENTRAL para el caso "SATISFACCIÓN CON LA CARRERA" (Variable categórica)
-# Solo calculamos
 
-# Variables de soporte para la variable categórica
-categorias_satisfaccion <- names(tabla_satisfaccion)
-freq_satisfaccion <- as.vector(tabla_satisfaccion)
-freq_acum_satisfaccion <- as.vector(f_acum_satisfaccion)
-n_total_satisfaccion <- sum(freq_satisfaccion)
+# Variables específicas para este caso
+
+# Vector de frecuencias absolutas para variable categórica
+frecuencias_cat <- as.vector(tabla_satisfaccion)
+
+# Vector de frecuencias acumuladas para variable categórica
+f_acum_cat <- as.vector(f_acum_satisfaccion)
+
+# Vector de categorías (niveles de satisfacción)
+categorias <- names(tabla_satisfaccion)
 
 # Definir variable categórica para mensajes
 variable_categorica <- "SATISFACCIÓN CON LA CARRERA"
 
-# Cálculo de la MODA para variable categórica
-# La moda es la categoría con mayor frecuencia
-indice_moda_cat <- which.max(freq_satisfaccion)
-moda_categorica <- categorias_satisfaccion[indice_moda_cat]
-freq_moda_cat <- freq_satisfaccion[indice_moda_cat]
+# Medidas de Tendencia Central para Variable Categórica
 
-# Cálculo de la MEDIANA para variable categórica ordinal
-# Posición de la mediana
-posicion_mediana_cat <- n_total_satisfaccion / 2
+# Moda
+# Índice de la categoría con mayor frecuencia
+indice_moda_cat <- which.max(frecuencias_cat)
 
-# Encontrar la categoría que contiene la mediana
-indice_mediana_cat <- which(freq_acum_satisfaccion >= posicion_mediana_cat)[1]
-mediana_categorica <- categorias_satisfaccion[indice_mediana_cat]
+# Moda: categoría con mayor frecuencia
+moda_categorica <- categorias[indice_moda_cat]
 
-# Cálculo de CUARTILES para variable categórica ordinal
-# Q1 (25%)
-posicion_q1_cat <- n_total_satisfaccion * 0.25
-indice_q1_cat <- which(freq_acum_satisfaccion >= posicion_q1_cat)[1]
-q1_categorica <- categorias_satisfaccion[indice_q1_cat]
+# Frecuencia de la moda
+frec_moda_cat <- frecuencias_cat[indice_moda_cat]
 
-# Q3 (75%)
-posicion_q3_cat <- n_total_satisfaccion * 0.75
-indice_q3_cat <- which(freq_acum_satisfaccion >= posicion_q3_cat)[1]
-q3_categorica <- categorias_satisfaccion[indice_q3_cat]
+# Cálculo de la Mediana categórica
+# Total de observaciones
+n_total_cat <- sum(frecuencias_cat)
 
-# Mostrar resultados para variable categórica
-message("\n Medidas de tendencia central para SATISFACCIÓN CON LA CARRERA (", variable_categorica, ")")
+# Posición de la mediana (n/2)
+pos_mediana <- n_total_cat / 2
 
-# Creamos la tabla de medidas estadísticas
+# Índice de la categoría que contiene la mediana
+indice_mediana_cat <- which(f_acum_cat >= pos_mediana)[1]
+
+# Mediana: categoría correspondiente
+mediana_categorica <- categorias[indice_mediana_cat]
+
+# Cálculo de Cuartiles y Rango Intercuartil
+# Convertir variable categórica a numérica para cálculos de cuartiles
+datos_numericos_cat <- as.numeric(as.factor(datos[[variable_categorica]]))
+
+# Cuartiles usando la función quantile
+cuartiles <- quantile(datos_numericos_cat, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
+
+# Rango intercuartil usando la función IQR
+rango_intercuartil <- IQR(datos_numericos_cat, na.rm = TRUE)
+
+# Convertir cuartiles numéricos de vuelta a categorías
+q1_cat <- categorias[round(cuartiles[1])]
+q2_cat <- categorias[round(cuartiles[2])]  # Mediana
+q3_cat <- categorias[round(cuartiles[3])]
+
+# Mostrar resultados categóricos
+message("\n📊 Resultados - VARIABLE CATEGÓRICA (", variable_categorica, ")")
+
+# Tabla resumen de medidas estadísticas categóricas
 categorica_stats <- data.frame(
   Moda = moda_categorica,
-  Freq_Moda = freq_moda_cat,
+  Frecuencia_Moda = frec_moda_cat,
   Mediana = mediana_categorica,
-  Q1 = q1_categorica,
-  Q3 = q3_categorica
+  Q1 = q1_cat,
+  Q2_Mediana = q2_cat,
+  Q3 = q3_cat,
+  Rango_Intercuartil = round(rango_intercuartil, 4)
 )
 
-
-# Imprimimos la tabla final con las medidas estadísticas
 print(categorica_stats, row.names = FALSE)
 
