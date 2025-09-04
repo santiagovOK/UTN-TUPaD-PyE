@@ -1,8 +1,10 @@
 # Santiago Octavio Varela - <santiago.varela@tupad.utn.edu.ar>
 
-# Última actualización: 2025-09-02
+# Última actualización: 2025-09-04
 
 # PyE - TPI - Semana 5, consignas 3-4 (continuación de la semana 3, lo nuevo de esta semana está a partir de TENDENCIA CENTRAL en cada caso)
+
+# Decidí mantener la porción de código respecto al calculo de frecuencias de semanas atrás para reutilizar variables si era necesario, pero también como referencia en cuanto a los datos
 
 # Instalamos los paquetes necesarios
 
@@ -30,7 +32,7 @@ tiempo_semanal <- datos$`TIEMPO SEMANAL en HS. DEDIC. EST.`
 
 n <- length(tiempo_semanal)
 
-# Número óptimo de intervalos (clases) siguienbdo la regla de Sturges
+# Número óptimo de intervalos (clases) siguiendo la regla de Sturges
 k <- ceiling(1 + 3.322 * log10(n))
 
 
@@ -84,10 +86,12 @@ cortes <- breaks[-length(breaks)]  # Removemos el último límite superior
 # Vector de marcas de clase (punto medio de cada intervalo)
 marca_clase <- (cortes + cortes + amplitud) / 2
 
-# Definir variable continua para mensajes
+# Definir variable continua para mensajes posteriores
 variable_continua <- "TIEMPO SEMANAL en HS. DEDIC. EST."
 
+# -
 # Medidas de TENDENCIA CENTRAL
+# -
 
 # Cálculos para la variable continua en "TIEMPO SEMANAL en HS. DEDIC. EST."
 
@@ -199,7 +203,9 @@ print(continua_stats, row.names = FALSE)
 
 message("\n Fin de resultados medidas de tendencia central - VARIABLE CONTINUA (", variable_continua, ")")
 
+# -
 # Construcción del histograma en función de las frecuencias absolutas
+# -
 
 # Agrupa datos numéricos en intervalos (bins) y muestra su frecuencia.
 
@@ -260,7 +266,9 @@ tabla_frecuencias_satisfaccion <- data.frame(
 print("Tabla de frecuencias para 'SATISFACCIÓN CON LA CARRERA' \n ")
 print(tabla_frecuencias_satisfaccion)
 
+# - 
 # MEDIDAS DE TENDENCIA CENTRAL para el caso "SATISFACCIÓN CON LA CARRERA" (Variable categórica)
+# -
 
 # Variables específicas para este caso
 
@@ -327,7 +335,9 @@ categorica_stats <- data.frame(
 
 print(categorica_stats, row.names = FALSE)
 
+# -
 # Gráfico circular (Torta) para la consigna 4 - muestra proporciones relativas de cada categoría respecto al total.
+# -
 
 # R BASE
 porcentajes_satisfaccion <- round(as.vector(f_rel_satisfaccion) * 100, 1) # convertimos a porcentajes
