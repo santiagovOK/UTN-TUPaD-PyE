@@ -1,4 +1,10 @@
 
+# Santiago Octavio Varela - <santiago.varela@tupad.utn.edu.ar>
+
+# Última actualización: 2025-10-18
+
+# PyE - TPI - Semana 12, consigna 7
+
 # readxl para la lectura del archivo
 if(!require(readxl)) install.packages("readxl")
 library(readxl)
@@ -98,10 +104,10 @@ message("\n CÁLCULO DE PROBABILIDAD (PUNTO 7.a)")
 # a. Calcular la probabilidad de que un estudiante tenga una estatura mayor o igual que 179 cm.
 # Usamos la función pnorm() que calcula la probabilidad en una distribución normal.
 
-# Definimos el valor de la estatura que nos interesa
+# Definimos el valor de la estatura que nos interesa y lo almacenamos en `estatura_limite`
 estatura_limite <- 179
 
-# Calculamos la probabilidad P(X >= 179)
+# Calculamos la probabilidad P(X >= 179), almacenando el resultado en `probabilidad_a`
 # Usamos los valores de media y desvío calculados previamente.
 # El argumento `lower.tail` es `FALSE` porque P(X > xi),
 
@@ -117,3 +123,52 @@ message("\n Resultados para el Ejercicio 7.a")
 
 # Mostramos el resultado de una forma clara y comprensible
 print(paste("La probabilidad de que un estudiante mida 179 cm o más es de:", round(probabilidad_a, 4)))
+
+
+# CÁLCULO DE PROBABILIDAD (PUNTO 7.b)
+
+# b. Calcular la probabilidad de que un estudiante tenga una estatura comprendida entre 147 cm. y 172 cm.
+# Para esto, calculamos P(X <= 172) y le restamos P(X <= 147).
+
+# Definimos los límites inferior y superior del intervalo
+estatura_inferior <- 147
+estatura_superior <- 172
+
+# Calculamos la probabilidad restando las probabilidades acumuladas, usando nuevamente `pnorm` y almacenando el resultado en `probabilidad_b `
+# pnorm() por defecto usa lower.tail = TRUE, que sirve para P(X <= x)
+probabilidad_b <- pnorm(estatura_superior, mean = media_agrupada, sd = desvio_agrupado) - 
+  pnorm(estatura_inferior, mean = media_agrupada, sd = desvio_agrupado)
+
+# MUESTRA DEL RESULTADO (PUNTO 7.b)
+
+message("\n Resultados para el Ejercicio 7.b")
+
+# Mostramos el resultado de forma clara
+print(paste("La probabilidad de que un estudiante mida entre 147 cm y 172 cm es de:", round(probabilidad_b, 4)))
+
+
+
+
+# CÁLCULO DE VALOR (PUNTO 7.c)
+
+# c. Hallar el valor que excede al 97,5% de las estaturas.
+# Según la interpretación literal, buscamos un valor `x` que sea mayor que el 97.5% de los datos. Esto corresponde al percentil 97.5.
+# La probabilidad acumulada a la izquierda de este valor es 0.975.
+
+# Definimos la probabilidad de la cola izquierda que vamos a buscar, que será almacenada en `probabilidad_c`.
+
+probabilidad_c <- 0.975
+
+# Calculamos el valor de la estatura correspondiente a esa probabilidad acumulada.
+estatura_c <- qnorm(probabilidad_c, 
+                            mean = media_agrupada, 
+                            sd = desvio_agrupado, 
+                            lower.tail = TRUE)
+
+# MUESTRA DEL RESULTADO (PUNTO 7.c)
+
+message("\n Resultados para el Ejercicio 7.c")
+
+# El mensaje ahora sí coincide directamente con la consigna.
+print(paste("El valor de estatura que excede al 97.5% de los estudiantes es:", round(estatura_c, 2), "cm."))
+
