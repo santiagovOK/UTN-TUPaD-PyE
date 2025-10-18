@@ -1,0 +1,119 @@
+
+# readxl para la lectura del archivo
+if(!require(readxl)) install.packages("readxl")
+library(readxl)
+
+# Leemos el archivo de excel propuesto.
+archivo <- "assets/TUPAD-2025-EST-TPI-planilla5.xlsx"
+datos <- read_excel(archivo)
+
+# a. Construimos la tabla de frecuencias en base a `ESTATURA CM.`
+
+# Seleccionamos los datos de la columna y omitimos valores nulos si los hubiera
+estaturas <- na.omit(datos$`ESTATURA CM.`)
+
+# Cantidad total de observaciones
+n <- length(estaturas)
+
+# Número óptimo de intervalos (clases) siguiendo la regla de Sturges
+k <- ceiling(1 + 3.322 * log10(n))
+
+# Mensaje informativo sobre los intervalos
+print(paste("Número óptimo de intervalos (k):", k))
+
+# Calculamos el rango y la amplitud
+rango <- range(estaturas)
+amplitud <- ceiling((rango[2] - rango[1]) / k)
+
+# Creamos los intervalos (breaks) y las clases (clases)
+breaks <- seq(floor(rango[1]), ceiling(rango[2]) + amplitud, by = amplitud)
+clases <- cut(estaturas, breaks = breaks, right = FALSE)
+
+# Creamos la tabla de frecuencias completa
+tabla_estaturas <- table(clases)
+f_acum_estaturas <- cumsum(tabla_estaturas)
+f_rel_estaturas <- prop.table(tabla_estaturas)
+f_rel_acum <- cumsum(f_rel_estaturas)
+
+# Construimos el dataframe final de la tabla
+tabla_estaturas_frecuencias <- data.frame(
+  Intervalo = levels(clases),
+  Frecuencia = as.vector(tabla_estaturas),
+  Frec_Acumulada = as.vector(f_acum_estaturas),
+  Frec_Relativa = round(as.vector(f_rel_estaturas), 3),
+  Frec_Rel_Acum = round(as.vector(f_rel_acum), 3)
+)
+
+# Mostramos la tabla de frecuencias
+print("Tabla de frecuencias para 'ESTATURA CM.'")
+print(tabla_estaturas_frecuencias)
+
+# CÁLCULO DE MEDIA Y DESVIACIÓN ESTÁNDAR PARA DATOS AGRUPADOS
+
+# Definir la variable para los mensajes posteriores
+variable_continua <- "ESTATURA CM."
+
+# Vector de frecuencias absolutas (ya calculado)
+frecuencias <- as.vector(tabla_estaturas)
+
+# Total de observaciones (ya calculado)
+n_total <- n
+
+# Vector de límites inferiores de cada intervalo
+cortes <- breaks[-length(breaks)]
+
+# Vector de marcas de clase (punto medio de cada intervalo)
+marca_clase <- (cortes + cortes + amplitud) / 2
+
+# Cálculo de la media para datos agrupados
+media_agrupada <- sum(marca_clase * frecuencias) / n_total
+
+# Cálculo de la varianza para datos agrupados
+varianza_agrupada <- sum(frecuencias * (marca_clase - media_agrupada)^2) / (n_total - 1)
+
+# Cálculo del desvío estándar para datos agrupados
+desvio_agrupado <- sqrt(varianza_agrupada)
+
+# ---
+# MUESTRA DE RESULTADOS
+# ---
+
+# Mostrar resultados de los cálculos principales
+message("\n Resultados de Media y Desviación Estándar - VARIABLE CONTINUA (", variable_continua, ")")
+
+# Tabla resumen con las medidas calculadas
+stats_agrupados <- data.frame(
+  Media_Agrupada = round(media_agrupada, 2),
+  Desvio_Estandar_Agrupado = round(desvio_agrupado, 2)
+)
+
+print(stats_agrupados, row.names = FALSE)
+
+# Mensaje final de esta sección
+message("\n Fin de los cálculos de media y desvío estándar para nuestra base de datos. Estos valores son aproximaciones basadas en los datos agrupados.")
+
+message("\n CÁLCULO DE PROBABILIDAD (PUNTO 7.a)")
+
+
+# a. Calcular la probabilidad de que un estudiante tenga una estatura mayor o igual que 179 cm.
+# Usamos la función pnorm() que calcula la probabilidad en una distribución normal.
+
+# Definimos el valor de la estatura que nos interesa
+estatura_limite <- 179
+
+# Calculamos la probabilidad P(X >= 179)
+# Usamos los valores de media y desvío calculados previamente.
+# El argumento `lower.tail` es `FALSE` porque P(X > xi),
+
+probabilidad_a <- pnorm(estatura_limite, 
+                        mean = media_agrupada, 
+                        sd = desvio_agrupado, 
+                        lower.tail = FALSE)
+
+
+# MUESTRA DEL RESULTADO (PUNTO 7.a)
+
+message("\n Resultados para el Ejercicio 7.a")
+
+# Mostramos el resultado de una forma clara y comprensible
+print(paste("La probabilidad de que un estudiante mida 179 cm o más es de:", round(probabilidad_a, 4)))
