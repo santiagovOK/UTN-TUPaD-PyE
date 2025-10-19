@@ -124,6 +124,28 @@ message("\n Resultados para el Ejercicio 7.a")
 # Mostramos el resultado de una forma clara y comprensible
 print(paste("La probabilidad de que un estudiante mida 179 cm o más es de:", round(probabilidad_a, 4)))
 
+# MUESTRA DEL RESULTADO (PUNTO 7.a)
+message("\n Resultados para el Ejercicio 7.a")
+print(paste("La probabilidad de que un estudiante mida 179 cm o más es de:", round(probabilidad_a, 4)))
+
+# GRÁFICO (PUNTO 7.a)
+# Creamos una secuencia de valores para graficar la curva normal
+# Esto va a ser válido también para los casos b. y c.
+x_curva <- seq(media_agrupada - 4 * desvio_agrupado, media_agrupada + 4 * desvio_agrupado, length = 400)
+y_curva <- dnorm(x_curva, mean = media_agrupada, sd = desvio_agrupado)
+
+# Dibujamos la curva de la distribución para este caso "Mayor que"
+plot(x_curva, y_curva, type = 'l', lwd = 2, col = "black",
+     main = paste("Probabilidad P(X >= ", estatura_limite, ") =", round(probabilidad_a, 4)),
+     xlab = "Estatura (cm)", ylab = "Densidad")
+
+# Creamos la secuencia de valores para el área sombreada (la cola derecha)
+x_sombreado_a <- seq(estatura_limite, media_agrupada + 4 * desvio_agrupado, length = 100)
+y_sombreado_a <- dnorm(x_sombreado_a, mean = media_agrupada, sd = desvio_agrupado)
+
+# Añadimos el polígono sombreado
+polygon(c(estatura_limite, x_sombreado_a, media_agrupada + 4 * desvio_agrupado), c(0, y_sombreado_a, 0), col = "skyblue")
+
 
 # CÁLCULO DE PROBABILIDAD (PUNTO 7.b)
 
@@ -146,6 +168,22 @@ message("\n Resultados para el Ejercicio 7.b")
 # Mostramos el resultado de forma clara
 print(paste("La probabilidad de que un estudiante mida entre 147 cm y 172 cm es de:", round(probabilidad_b, 4)))
 
+# MUESTRA DEL RESULTADO (PUNTO 7.b)
+message("\n Resultados para el Ejercicio 7.b")
+print(paste("La probabilidad de que un estudiante mida entre 147 cm y 172 cm es de:", round(probabilidad_b, 4)))
+
+# GRÁFICO (PUNTO 7.b)
+# Dibujamos la curva de la distribución para este caso "Entre"
+plot(x_curva, y_curva, type = 'l', lwd = 2, col = "black",
+     main = paste("Probabilidad P(", estatura_inferior, "<= X <=", estatura_superior, ") =", round(probabilidad_b, 4)),
+     xlab = "Estatura (cm)", ylab = "Densidad")
+
+# Creamos la secuencia de valores para el área sombreada (el área central)
+x_sombreado_b <- seq(estatura_inferior, estatura_superior, length = 100)
+y_sombreado_b <- dnorm(x_sombreado_b, mean = media_agrupada, sd = desvio_agrupado)
+
+# Añadimos el polígono sombreado
+polygon(c(estatura_inferior, x_sombreado_b, estatura_superior), c(0, y_sombreado_b, 0), col = "skyblue")
 
 
 
@@ -172,3 +210,24 @@ message("\n Resultados para el Ejercicio 7.c")
 # El mensaje ahora sí coincide directamente con la consigna.
 print(paste("El valor de estatura que excede al 97.5% de los estudiantes es:", round(estatura_c, 2), "cm."))
 
+# GRÁFICO (PUNTO 7.c)
+
+# Dibujamos la curva de la distribución para este caso "Menor que"
+plot(x_curva, y_curva, type = 'l', lwd = 2, col = "black",
+     main = "Valor que excede al 97.5% de las Estaturas",
+     xlab = "Estatura (cm)", ylab = "Densidad")
+
+# Creamos la secuencia de valores para el área sombreada (el 97.5% a la izquierda)
+x_sombreado_c <- seq(media_agrupada - 4 * desvio_agrupado, estatura_c, length = 200)
+y_sombreado_c <- dnorm(x_sombreado_c, mean = media_agrupada, sd = desvio_agrupado)
+
+# Añadimos el polígono sombreado
+polygon(c(media_agrupada - 4 * desvio_agrupado, x_sombreado_c, estatura_c), c(0, y_sombreado_c, 0), col = "skyblue")
+
+# Añadimos una línea vertical para marcar el valor exacto
+abline(v = estatura_c, col = "red", lwd = 2, lty = 2)
+
+# Añadimos texto para indicar el valor y la probabilidad
+text(x = estatura_c, y = max(y_curva) * 0.5, 
+     labels = paste("Percentil 97.5\n", round(estatura_c, 2), "cm"), 
+     pos = 4, col = "red") # pos=4 lo coloca a la derecha
