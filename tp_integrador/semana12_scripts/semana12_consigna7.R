@@ -124,9 +124,6 @@ message("\n Resultados para el Ejercicio 7.a")
 # Mostramos el resultado de una forma clara y comprensible
 print(paste("La probabilidad de que un estudiante mida 179 cm o más es de:", round(probabilidad_a, 4)))
 
-# MUESTRA DEL RESULTADO (PUNTO 7.a)
-message("\n Resultados para el Ejercicio 7.a")
-print(paste("La probabilidad de que un estudiante mida 179 cm o más es de:", round(probabilidad_a, 4)))
 
 # GRÁFICO (PUNTO 7.a)
 # Creamos una secuencia de valores para graficar la curva normal
@@ -166,10 +163,6 @@ probabilidad_b <- pnorm(estatura_superior, mean = media_agrupada, sd = desvio_ag
 message("\n Resultados para el Ejercicio 7.b")
 
 # Mostramos el resultado de forma clara
-print(paste("La probabilidad de que un estudiante mida entre 147 cm y 172 cm es de:", round(probabilidad_b, 4)))
-
-# MUESTRA DEL RESULTADO (PUNTO 7.b)
-message("\n Resultados para el Ejercicio 7.b")
 print(paste("La probabilidad de que un estudiante mida entre 147 cm y 172 cm es de:", round(probabilidad_b, 4)))
 
 # GRÁFICO (PUNTO 7.b)
